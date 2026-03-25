@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Насколько ты меня любишь? 💗</title>
+
+<style>
+
+body{
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:linear-gradient(135deg,#ff9acb,#ffc0e1,#ffd6ee);
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+}
+
+.container{
+background:rgba(255,255,255,0.9);
+padding:40px;
+border-radius:22px;
+box-shadow:0 15px 40px rgba(0,0,0,.15);
+width:90%;
+max-width:550px;
+text-align:center;
+position:relative;
+}
+
+h1{
+color:#ff2f8a;
+margin-bottom:25px;
+}
+
+.start-title{
+font-size:42px;
+color:#ff2f8a;
+margin-bottom:30px;
+animation:fade 1s ease;
+}
+
+.start-btn{
+font-size:20px;
+padding:16px;
+}
+
+h2{
+color:#ff3f95;
+margin-bottom:20px;
+}
+
+.answers{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+button{
+background:#ff4fa3;
+border:none;
+padding:13px;
+border-radius:14px;
+color:white;
+font-size:16px;
+cursor:pointer;
+transition:all .25s ease;
+box-shadow:0 6px 18px rgba(255,79,163,.4);
+}
+
+button:hover{
+transform:scale(1.07) translateY(-2px);
+box-shadow:0 10px 25px rgba(255,79,163,.6);
+}
+
+.fade{
+animation:fade .5s ease;
+}
+
+@keyframes fade{
+from{opacity:0; transform:translateY(15px)}
+to{opacity:1; transform:translateY(0)}
+}
+
+.result{
+font-size:24px;
+color:#ff2d86;
+margin-top:20px;
+animation:pop 0.6s ease;
+}
+
+@keyframes pop{
+0%{transform:scale(.6);opacity:0}
+80%{transform:scale(1.1)}
+100%{transform:scale(1)}
+}
+
+.progress{
+height:8px;
+background:#ffd1e8;
+border-radius:10px;
+margin-bottom:20px;
+overflow:hidden;
+display:none;
+}
+
+.progress-bar{
+height:100%;
+width:0%;
+background:#ff4fa3;
+transition:width .4s ease;
+}
+
+.hearts{
+position:fixed;
+width:100%;
+height:100%;
+left:0;
+top:0;
+pointer-events:none;
+}
+
+.heart{
+position:absolute;
+color:#ff7db8;
+animation:float 6s linear infinite;
+}
+
+@keyframes float{
+0%{transform:translateY(100vh) scale(.5);opacity:0}
+50%{opacity:1}
+100%{transform:translateY(-10vh) scale(1.2);opacity:0}
+}
+
+.restart-btn{
+margin-top:20px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="hearts" id="hearts"></div>
+
+<div class="container">
+
+<div id="startScreen">
+<div class="start-title">Романтический ужин 💖</div>
+<button class="start-btn" onclick="startQuiz()">Начать романтический ужин</button>
+</div>
+
+<h1 id="quizTitle" style="display:none;">Насколько ты меня любишь? 💖</h1>
+
+<div class="progress" id="progressContainer">
+<div class="progress-bar" id="progress"></div>
+</div>
+
+<div id="quiz" class="fade"></div>
+<div id="result" class="result"></div>
+
+</div>
+
+<script>
+
+const questions=[
+{
+q:"Как часто ты думаешь обо мне?",
+a:["Каждую минуту","Частенько","Иногда","Соси"],
+s:[4,3,2,1]
+},
+{
+q:"Скучаешь ли ты по мне?",
+a:["Очень сильно","Да","Немного","Ты че еблан"],
+s:[4,3,2,1]
+},
+{
+q:"Насколько ты любишь мои объятия?",
+a:["Обожаю","Очень люблю","Нормально","Отвали мразь"],
+s:[4,3,2,1]
+},
+{
+q:"Хотела бы ты проводить со мной больше времени?",
+a:["Каждый день","Очень хочу","Иногда","Лучше бы не видела никогда"],
+s:[4,3,2,1]
+},
+{
+q:"Если я напишу тебе ночью, ты ответишь?",
+a:["Конечно сразу","Да","Если не сплю","Нет, соси"],
+s:[4,3,2,1]
+},
+{
+q:"Нравится ли тебе моя улыбка?",
+a:["Она лучшая","Очень","Да","Уродская"],
+s:[4,3,2,1]
+},
+{
+q:"Хотела бы ты сейчас обняться?",
+a:["Да 100%","Очень","Немного","Фу нахуй"],
+s:[4,3,2,1]
+},
+{
+q:"Если бы я был рядом прямо сейчас?",
+a:["Я бы обняла тебя","Улыбнулась","Поговорила","Плюнула в лицо"],
+s:[4,3,2,1]
+},
+{
+q:"Насколько я для тебя важен?",
+a:["Очень очень важен","Важен","Немного","Ваще нет"],
+s:[4,3,2,1]
+},
+{
+q:"Ты бы пошла со мной на свидание прямо сегодня?",
+a:["Конечно","Да","Может быть","Иди со своими блядями"],
+s:[4,3,2,1]
+}
+];
+
+let current=0;
+let score=0;
+
+function startQuiz(){
+document.getElementById("startScreen").style.display="none";
+document.getElementById("quizTitle").style.display="block";
+document.getElementById("progressContainer").style.display="block";
+
+current=0;
+score=0;
+document.getElementById("result").innerHTML="";
+showQuestion();
+}
+
+function restartQuiz(){
+startQuiz();
+}
+
+function showQuestion(){
+const q=questions[current];
+
+let html=`<h2>${q.q}</h2><div class="answers">`;
+
+q.a.forEach((ans,i)=>{
+html+=`<button onclick="answer(${i})">${ans}</button>`;
+});
+
+html+="</div>";
+
+const quiz=document.getElementById("quiz");
+quiz.classList.remove("fade");
+
+setTimeout(()=>{
+quiz.innerHTML=html;
+quiz.classList.add("fade");
+},100);
+
+updateProgress();
+}
+
+function answer(i){
+score+=questions[current].s[i];
+current++;
+
+if(current<questions.length){
+showQuestion();
+}else{
+showResult();
+}
+}
+
+function updateProgress(){
+let percent=(current/questions.length)*100;
+document.getElementById("progress").style.width=percent+"%";
+}
+
+function showResult(){
+let max=questions.length*4;
+let percent=Math.round(score/max*100);
+
+let text="";
+
+if(percent>90) text="Ты прошла тест";
+else if(percent>70) text="Ты почти прошла тест";
+else if(percent>50) text="Удали мой номер";
+else text="Не это ли настоящая любовь..";
+
+document.getElementById("quiz").innerHTML="";
+
+document.getElementById("result").innerHTML=
+`Уровень любви: <b>${percent}%</b><br><br>${text}
+<br><button class="restart-btn" onclick="restartQuiz()">Пройти заново</button>`;
+
+updateProgress();
+}
+
+function createHeart(){
+const heart=document.createElement("div");
+heart.className="heart";
+heart.innerHTML="❤";
+heart.style.left=Math.random()*100+"vw";
+heart.style.fontSize=(10+Math.random()*30)+"px";
+heart.style.animationDuration=(4+Math.random()*4)+"s";
+
+document.getElementById("hearts").appendChild(heart);
+
+setTimeout(()=>heart.remove(),7000);
+}
+
+setInterval(createHeart,350);
+
+</script>
+
+</body>
+</html>
